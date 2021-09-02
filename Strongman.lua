@@ -74,8 +74,8 @@ local NewCFrame = CFrame.new(-79.9094696, 19.8263607, 8124.82129, 1, 0, 0, 0, 1,
 --// Functions \\ --
 local fireproximityprompt = fireproximityprompt;
 local firetouchinterest = firetouchinterest;
-local task.wait = task.wait;
-local task.spawn = task.spawn;
+local task.spawn = task.spawn or coroutine.wrap;
+local task.wait = task.wait or wait;
 local pairs = pairs;
 
 local function GetBadges()
