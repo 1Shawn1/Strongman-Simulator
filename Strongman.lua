@@ -74,8 +74,8 @@ local NewCFrame = CFrame.new(-79.9094696, 19.8263607, 8124.82129, 1, 0, 0, 0, 1,
 --// Functions \\ --
 local fireproximityprompt = fireproximityprompt;
 local firetouchinterest = firetouchinterest;
-local task.spawn = task.spawn or coroutine.wrap;
-local task.wait = task.wait or wait;
+local task_spawn = task.spawn 
+local task_wait = task.wait or wait;
 local pairs = pairs;
 
 local function GetBadges()
@@ -90,14 +90,14 @@ local function AutoWorkOut()
 		if Variable:IsA(ProximityPromptString) then
 			HumanoidRootPart.CFrame = Collider.CFrame
 
-			repeat wait() fireproximityprompt(Variable) until HumanoidRootPart.Anchored
+			repeat task_wait() fireproximityprompt(Variable) until HumanoidRootPart.Anchored
 		end
 	end
 	
-	task.spawn(function()
+	task_spawn(function()
 		while getgenv().Settings.Automatic do 
 			UpgradeStrength:InvokeServer(getgenv().Settings.Multiplier)
-			task.wait()
+			task_wait()
 		end
 	end)
 end
@@ -107,12 +107,12 @@ local function LagServer()
 		if Variable:IsA(ProximityPromptString) then
 			HumanoidRootPart.CFrame = Collider.CFrame
 
-			repeat wait() fireproximityprompt(Variable) until HumanoidRootPart.Anchored
+			repeat task_wait() fireproximityprompt(Variable) until HumanoidRootPart.Anchored
 		end
 	end
 
 	for _ = TheNumberOne, TheNumberFourHundred do
-		task.spawn(function()
+		task_spawn(function()
 			UpgradeStrength:InvokeServer(WTFInteger)
 		end)
 	end
@@ -146,7 +146,7 @@ end
 
 -- Don't know why you did this
 HumanoidRootPart.CFrame = NewCFrame
-task.wait(0.25)
+task_wait(0.25)
 HumanoidRootPart.CFrame = OldCFrame
 
 -- Ui
@@ -196,8 +196,8 @@ end)
 autofarm:addToggle("Enabled", nil, function(value) -- i'll optimize this code later
 	getgenv().Settings.Toggle = value
 	HumanoidRootPart.CFrame = NewCFrame
-	wait(0.1)
-	task.spawn(function()
+	task_wait(0.1)
+	task_spawn(function()
 		while getgenv().Settings.Toggle do
 			task.wait(0.1)
 			HumanoidRootPart.CFrame = NewCFrame
@@ -209,7 +209,7 @@ autostrength:addToggle("Enabled", nil, function(value) -- i'll optimize this cod
 	
 	getgenv().Settings.Automatic = value
 
-	task.spawn(function()
+	task_spawn(function()
 		CoreGui.PurchasePromptApp.Enabled = false
 		while getgenv().Settings.Automatic do
 			AutoWorkOut()
@@ -245,13 +245,13 @@ PlayerDraggablesObject.DescendantAdded:Connect(function(AddedObject)
 		AddedObject:Destroy()
 
 	elseif getgenv().Settings.Toggle and AddedObject:IsA(PartString) and AddedObject:FindFirstChild(CoinString) then
-		repeat task.wait() until firetouchinterest(AddedObject, Goal, TheNumberZero); firetouchinterest(AddedObject, Goal, TheNumberOne); not AddedObject
+		repeat task_wait() until firetouchinterest(AddedObject, Goal, TheNumberZero); firetouchinterest(AddedObject, Goal, TheNumberOne); not AddedObject
 	end
 end)
 
 Avoid:ClearAllChildren()
 Avoid.ChildAdded:Connect(function(AddedObject)
-	task.wait()
+	task_wait()
 	AddedObject:Destroy()
 end)
 
