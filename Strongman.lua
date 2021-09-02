@@ -205,7 +205,7 @@ autostrength:addToggle("Enabled", nil, function(value) -- i'll optimize this cod
 	task.spawn(function()
 		CoreGui.PurchasePromptApp.Enabled = false
 		while getgenv().Settings.Automatic do
-			
+			AutoWorkOut()
 		end
 		CoreGui.PurchasePromptApp.Enabled = true
 	end)
