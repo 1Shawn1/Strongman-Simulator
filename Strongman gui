@@ -1,187 +1,191 @@
-repeat
-	wait()
-until game:IsLoaded()
-repeat
-	wait()
-until game.Players.LocalPlayer.Character
-wait()
-_G.On = false
-_G.auto = false
-local Codes = {
-	"strongman",
-	"100m",
-	"Chad",
-	"10m",
-	"25k",
-	"1500likes",
-	"5000likes",
-	"10000",
-	"500likes"
-}
-local HumanoidRootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
-local pairs = pairs
-local rs = game:GetService("RunService")
-local area = game:GetService("Workspace").Areas["Area14_Retro"]
-local fireproximityprompt = fireproximityprompt
-local prox
-local function GetBadges()
-	for _, v in pairs(game:GetService("Workspace").BadgeColliders:GetChildren()) do
-		firetouchinterest(HumanoidRootPart, v, 0)
-		firetouchinterest(HumanoidRootPart, v, 1)
-	end
-end
-local function autoworkout()
-	wait(0.1)
-	for i, v in pairs(game:GetService("Workspace").Areas.Area1.Gym.TrainingEquipment:GetDescendants()) do
-		if v:IsA("ProximityPrompt") then
-			HumanoidRootPart.CFrame = game:GetService("Workspace").Areas.Area1.Gym.TrainingEquipment.WorkoutStation.Collider.CFrame
-			repeat
-				wait()
-				fireproximityprompt(v)
-			until HumanoidRootPart.Anchored == true
-		end
-	end
-	while _G.auto do
-		task.wait()
-		if not _G.multipier or _G.multipier == 0 then
-			game:GetService("ReplicatedStorage").StrongMan_UpgradeStrength:InvokeServer()
-		else
-			game:GetService("ReplicatedStorage").StrongMan_UpgradeStrength:InvokeServer(_G.multipier)
-		end
-	end
-end
-local function LagServer()
-	wait(0.1)
-	for i, v in pairs(game:GetService("Workspace").Areas.Area1.Gym.TrainingEquipment:GetDescendants()) do
-		if v:IsA("ProximityPrompt") then
-			HumanoidRootPart.CFrame = game:GetService("Workspace").Areas.Area1.Gym.TrainingEquipment.WorkoutStation.Collider.CFrame
-			repeat
-				wait()
-				fireproximityprompt(v)
-			until HumanoidRootPart.Anchored == true
-		end
-	end
-	for i = 1, 400 do
-		pcall(function()
-			game:GetService("ReplicatedStorage").StrongMan_UpgradeStrength:InvokeServer(2 ^ 1024)
-		end)
-	end
+
+
+local plrs = game:GetService("Players")
+local lp = plrs.LocalPlayer
+local char = lp.Character
+local hrp = char:FindFirstChild("HumanoidRootPart")
+local humanoid = char:FindFirstChild("Humanoid")
+getgenv().range = 1000
+getgenv().looped = true
+local debounce = false
+local version = "0.1.A"
+local sips = 0
+function Format(Int)
+	return string.format("%02i", Int)
 end
 
-local function BreakExits()
-	for _, v in pairs(game:GetService("Workspace").Areas:GetDescendants()) do
-		if v.Name:lower():find("exit") or v.Name:lower():find("copy") then
-			v:Destroy()
-		end
-	end
-end
-game:GetService("Workspace").Avoid:ClearAllChildren()
-game:GetService("Workspace").Avoid.ChildAdded:Connect(function(add)
-	rs.RenderStepped:Wait()
-	add:Destroy()
-end)
-
-local rs = game:GetService("RunService")
-game:GetService("Workspace").PlayerDraggables[game.Players.LocalPlayer.UserId].DescendantAdded:Connect(function(added)
-	if added.Name == "ExtraWeight" and _G.noweight then
-		added:Destroy()
-	end
-end)
-game:GetService("Workspace").PlayerDraggables[game.Players.LocalPlayer.UserId].DescendantAdded:Connect(function(added)
-	rs.RenderStepped:Wait()
-	if  added:IsA("Part") and added:FindFirstChild("Coins") ~= nil then
-		if not _G.On then
-			return
-		end
-		repeat
-			wait(0.1)
-			firetouchinterest(added, game:GetService("Workspace").Areas["Area14_Retro"].Goal, 0)
-			firetouchinterest(added, game:GetService("Workspace").Areas["Area14_Retro"].Goal, 1)
-		until added == nil
-	end
-end)
-
-
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
-local venyx = library.new("Strongman Simulator", 5013109572)
-
-local main = venyx:addPage("Main", 5012544693)
-
-local farm = venyx:addPage("Farming", 5012544693)
-
-local page = venyx:addPage("Character", 5012544693)
-local settings = venyx:addPage("Settings", 5012544693)
-local autofarm = farm:addSection("Auto Farm")
-local autostrength = farm:addSection("Auto Strength")
-local char = page:addSection("Character")
-local mainsec = main:addSection("Main")
-local Settingss = settings:addSection("Settings")
-
-mainsec:addButton("Get all badges", function()
-	GetBadges()
-end)
-
-mainsec:addButton("Break Exits", function()
-	BreakExits()
-end)
-
-mainsec:addButton("Lag Server", function()
-	LagServer()
-end)
-
-Settingss:addButton("Rejoin Server", function()
-	game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId)
-end)
-local oldpos = HumanoidRootPart.CFrame
-HumanoidRootPart.CFrame = CFrame.new(-79.9094696, 19.8263607, 8124.82129, 1, 0, 0, 0, 1, 0, 0, 0, 1)
-wait(0.25)
-HumanoidRootPart.CFrame = oldpos
-for _, v in pairs(area.DraggableItems:GetDescendants()) do
-	if v:IsA("StringValue") and v.Name == "Title" and v.Value == "PYRAMID" then
-		local part = v.Parent.InteractionPoint
-		_G.Prox = v.Parent.InteractionPoint.ProximityPrompt
-	end
+function convertToHMS(Seconds)
+	local Minutes = (Seconds - Seconds%60)/60
+	Seconds = Seconds - Minutes*60
+	local Hours = (Minutes - Minutes%60)/60
+	Minutes = Minutes - Hours*60
+	
+	local Days = (Hours - Hours%24)/24
+	
+	Days = Hours - Days*24
+	
+	
+	
+	return "It's been "..Format(Days).." Days, "..Format(Hours).." Hours, "..Format(Minutes).." Minutes, "..Format(Seconds).." Seconds Since I've started drinking."
 end
 
-mainsec:addToggle("Disable Purchase Prompts", nil, function(value)
-	_G.Value = value
-	if _G.Value then
-		game:GetService("CoreGui").PurchasePromptApp.Enabled = false
-	else
-		_G.Value = value
-		game:GetService("CoreGui").PurchasePromptApp.Enabled = true
-	end
-end)
+print(convertToHMS(time()))
 
-autofarm:addToggle("Enabled", nil, function(value)
-	_G.On = value
-	HumanoidRootPart.CFrame = CFrame.new(-79.9094696, 19.8263607, 8124.82129, 1, 0, 0, 0, 1, 0, 0, 0, 1)
-	wait(0.1)
-	task.defer(function()
-		game.RunService.RenderStepped:connect(function()
-			task.wait(0.1)
-			if _G.On then
-				HumanoidRootPart.CFrame = CFrame.new(-79.9094696, 19.8263607, 8124.82129, 1, 0, 0, 0, 1, 0, 0, 0, 1)
-				fireproximityprompt(_G.Prox, 0)
+
+--[[local tool = lp.Backpack:FindFirstChildWhichIsA("Tool")
+tool.Parent = char]] 
+local function getMag(vector1, vector2)
+-- removes sqrt because time, reduces function complexity
+    local newV2 = Vector3.new(vector2.X, vector1.Y, vector2.Z)
+--return (vector1 - newV2).magnitude
+    return (vector1 - vector2).magnitude
+--return ((vector1.X - vector2.X)^2)+((vector1.Y - vector2.Y)^2)+((vector1.Z - vector2.Z)^2)
+end
+function checkSight(target)
+	local ray = Ray.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position, (target.Position - game.Players.LocalPlayer.Character.Head.Position).Unit * getgenv().range)
+	local hit,position = workspace:FindPartOnRayWithIgnoreList(ray, {game.Players.LocalPlayer.Character})
+	if hit then
+		if hit:IsDescendantOf(target.Parent) and not hit:IsDescendantOf(game.Players.LocalPlayer.Character) and math.abs(hit.Position.Y - game.Players.LocalPlayer.Character.Head.Position.Y) < 500 then
+			print("I can see the target")
+			return true
+		end
+	end
+	return false
+end
+function chat(message)
+     game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents").SayMessageRequest:FireServer(message,"All")
+    end
+function cameraLookAt(target)
+    workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, target.Position)
+end
+
+
+
+function bighead(target,size)
+    if size then 
+        target.Size = Vector3.new(size,size,size)
+        else
+           target.size = Vector3.new(5,5,5)
+       end
+    end
+function charLookAt(chr, target) --assume chr is a character and target is a brick to look towards
+    if char.PrimaryPart then --just make sure the character's HRP has loaded
+        local chrPos = char.PrimaryPart.Position --get the position of the HRP
+        local tPos = target.Position --get the position of the target
+        local newCF = CFrame.new(Vector3.new(chrPos.x, chrPos.y, chrPos.z), Vector3.new(tPos.x, chrPos.y, tPos.z)) --create our CFrame
+        char:SetPrimaryPartCFrame(newCF) --set the HRP's CFrame to our result, thus moving the character!
+    end
+end
+
+local function findClosePlayer()
+    print("findcloseplayer called")
+    local bestplayer = nil
+    local bestDist = math.huge
+    while bestplayer == nil do wait()
+        local root = hrp
+        for _, player in pairs(game:GetService("Players"):GetChildren()) do
+            if player.Name ~= game.Players.LocalPlayer.Name then
+            pcall(function()
+             if player.Character:FindFirstChild("HumanoidRootPart") ~= nil then
+                 if checkSight(player.character.Head) then
+                  local dst = getMag(root.Position, player.character.HumanoidRootPart.Position)
+                  if dst < bestDist then
+                        bestplayer = player
+                        bestDist = dst
+                  end
+
+end
+             end
+             end)
+        end
+        end
+        
+        if bestplayer ~= nil then
+            break
+        end
+    end
+    --targetPart.CFrame = bestplayer.HumanoidRootPart.CFrame * CFrame.new(0,5,0)
+    return bestplayer
+end
+
+function findPath(target)
+	local path = game:GetService("PathfindingService"):CreatePath()
+	path:ComputeAsync(hrp.Position,target.Character:WaitForChild("HumanoidRootPart").Position)
+	local waypoints = path:GetWaypoints()
+	if path.Status == Enum.PathStatus.Success then
+		    for _, waypoint in ipairs(waypoints) do
+			if waypoint.Action == Enum.PathWaypointAction.Jump then
+			        chat("Elevated Path Found Jumping")
+					game.Players.LocalPlayer.Character.Humanoid.Jump = true
 			end
-		end)
-	end)
-end)
-autostrength:addToggle("Enabled", nil, function(value)
-	_G.auto = value
-	if _G.auto then
-		game:GetService("CoreGui").PurchasePromptApp.Enabled = false
-		task.defer(autoworkout)
-	else
-		game:GetService("CoreGui").PurchasePromptApp.Enabled = true
+			game.Players.LocalPlayer.Character.Humanoid:MoveTo(waypoint.Position)
+			local timeOut = game.Players.LocalPlayer.Character.Humanoid.MoveToFinished:Wait(1)
+			if not timeOut then
+			        chat("Target Sight Lost, Recalculating")
+					game.Players.LocalPlayer.Character.Humanoid.Jump = true
+				    print("Path too long!")
+			    	findPath(target)
+				break
+			end
+			if checkSight(target.Character.HumanoidRootPart) then
+			    chat("Chasing Target")
+			    
+				repeat
+					print("Moving directly to the target")
+						game.Players.LocalPlayer.Character.Humanoid:MoveTo(target.Character.HumanoidRootPart.Position)
+					wait(0.1)
+					if target == nil then
+						break
+					elseif target.Parent == nil then
+						break
+					end
+						if game.Players.LocalPlayer.Character.Humanoid.Health <= 90 then
+	                        break
+                 	end
+				until checkSight(target.Character.HumanoidRootPart) == false or game.Players.LocalPlayer.Character.Humanoid.Health < 1 or target.Character.Humanoid.Health < 1
+				
+			end
+			if (hrp.Position - waypoints[1].Position).magnitude > 20 then
+			    chat("Target Moved Recalculating Path")
+				print("Target has moved, generating new path")
+				findPath(target)
+				break
+			end
+		end
+		
 	end
-end)
-autostrength:addSlider("Muliplier", 0, 0, 500, function(value)
-	_G.multipier = value
-end)
-char:addSlider("WalkSpeed", 0, 0, 1000, function(value)
-	game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
-end)
-char:addSlider("JumpPower", 0, 0, 1000, function(value)
-	game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
-end)
+end
+
+
+
+while getgenv().looped do wait()
+   
+    local player = findClosePlayer()
+   -- findPath(player)
+   
+       charLookAt(char,player.Character:FindFirstChild("Head"))
+    
+    
+  --  if humanoid.Health <= 90 then
+           
+            repeat wait()
+                
+                if getMag(hrp.Position,player.Character.HumanoidRootPart.Position) <= 60 then
+                    
+                    spawn(function()
+                         if getMag(hrp.Position,player.Character.HumanoidRootPart.Position) <= 4 then
+                             game:GetService("Workspace").Live.Perthyz.Brawl:Activate()
+                             end
+                        
+                        end)
+            humanoid.Jump = true
+       charLookAt(char,player.Character:FindFirstChild("Head"))
+        charLookAt(char,player.Character:FindFirstChild("Head"))
+         charLookAt(char,player.Character:FindFirstChild("Head"))
+                humanoid:MoveTo(player.Character.Head.CFrame * CFrame.new(math.random(-1,1),0,0).p)
+                end
+                until humanoid.Health >= 90 
+     --   end
+    
+    end
+
