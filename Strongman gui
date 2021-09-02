@@ -1,10 +1,5 @@
-repeat
-	wait()
-until game:IsLoaded()
-repeat
-	wait()
-until game.Players.LocalPlayer.Character
-wait()
+if not game:IsLoaded() then game.Loaded:Wait() end
+
 _G.On = false
 _G.auto = false
 local Codes = {
@@ -18,7 +13,8 @@ local Codes = {
 	"10000",
 	"500likes"
 }
-local HumanoidRootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+local Character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
+local HumanoidRootPart = Character.HumanoidRootPart
 local pairs = pairs
 local rs = game:GetService("RunService")
 local area = game:GetService("Workspace").Areas["Area14_Retro"]
@@ -180,8 +176,8 @@ autostrength:addSlider("Muliplier", 0, 0, 500, function(value)
 	_G.multipier = value
 end)
 char:addSlider("WalkSpeed", 0, 0, 1000, function(value)
-	game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+	Character.Humanoid.WalkSpeed = value
 end)
 char:addSlider("JumpPower", 0, 0, 1000, function(value)
-	game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
+	Character.Humanoid.JumpPower = value
 end)
