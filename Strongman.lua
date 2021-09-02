@@ -1,12 +1,17 @@
-repeat
-	wait()
-until game:IsLoaded()
-repeat
-	wait()
-until game.Players.LocalPlayer.Character
-wait()
-_G.On = false
-_G.auto = false
+-- this code is full of retarded microoptimizations and the code may not work since i didnt test it /shrug but i assume you can fix it 
+if not game:IsLoaded() then
+	game.Loaded:Wait()
+end
+
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
+getgenv().Settings = {
+	['Toggle'] = false;
+	['Automatic'] = true;
+	['WeightToggle'] = true;
+	['Multiplier'] = 0;
+	['DisablePurchase'] = false;
+};
+
 local Codes = {
 	"strongman",
 	"100m",
@@ -17,92 +22,134 @@ local Codes = {
 	"5000likes",
 	"10000",
 	"500likes"
-}
-local HumanoidRootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
-local pairs = pairs
-local rs = game:GetService("RunService")
-local area = game:GetService("Workspace").Areas["Area14_Retro"]
-local fireproximityprompt = fireproximityprompt
-local prox
+};
+
+local HitList = {
+	'exit';
+	'copy';
+};
+
+-- // Services \\ --
+local game = game
+local Players = game:GetService('Players');
+local RunService = game:GetService('RunService');
+local workspace = game:GetService("Workspace"); -- I could localize workspace with (workspace the global) but namecall is winning?
+local ReplicatedStorage = game:GetService('ReplicatedStorage');
+local TeleportService = game:GetService("TeleportService");
+local CoreGui = game:GetService("CoreGui");
+
+--// Variables \\ --
+local Player = Players.LocalPlayer;
+local Character = Player.Character or Player.CharacterAdded;
+local HumanoidRootPart = Character:FindFirstChild('HumanoidRootPart') or Character.PrimaryPart;
+local Humanoid = Character:FindFirstChild('Humanoid')
+local PlayerDraggablesObject = workspace.PlayerDraggables[LocalPlayer.UserId];
+local OldCFrame = HumanoidRootPart.CFrame
+local prox;
+
+local Areas = workspace.Areas:GetDescendants();
+local Gym = workspace.Areas.Area1.Gym;
+local Avoid = workspace.Avoid;
+local Goal = workspace.Areas["Area14_Retro"].Goal
+
+local Badges = workspace.BadgeColliders:GetChildren();
+local TrainingEquipment = Gym.TrainingEquipment:GetDescendants();
+
+local Collider = Gym.TrainingEquipment.WorkoutStation.Collider;
+
+local TheNumberZero = 0;
+local TheNumberOne = 1;
+local TheNumberFourHundred = 400;
+local WTFInteger = 2 ^ 1024;
+
+local ProximityPromptString = "ProximityPrompt";
+local WeightString = 'ExtraWeight';
+local PartString = 'Part';
+local CoinString = 'Coin';
+
+local UpgradeStrength = ReplicatedStorage.StrongMan_UpgradeStrength;
+local NewCFrame = CFrame.new(-79.9094696, 19.8263607, 8124.82129, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+
+--// Functions \\ --
+local fireproximityprompt = fireproximityprompt;
+local firetouchinterest = firetouchinterest;
+local task.wait = task.wait;
+local task.spawn = task.spawn;
+local pairs = pairs;
+
 local function GetBadges()
-	for _, v in pairs(game:GetService("Workspace").BadgeColliders:GetChildren()) do
-		firetouchinterest(HumanoidRootPart, v, 0)
-		firetouchinterest(HumanoidRootPart, v, 1)
+	for Index, Variable in pairs(Badges) do
+		firetouchinterest(HumanoidRootPart, Variable, TheNumberZero)
+		firetouchinterest(HumanoidRootPart, Variable, TheNumberOne)
 	end
 end
-local function autoworkout()
-	wait(0.1)
-	for i, v in pairs(game:GetService("Workspace").Areas.Area1.Gym.TrainingEquipment:GetDescendants()) do
-		if v:IsA("ProximityPrompt") then
-			HumanoidRootPart.CFrame = game:GetService("Workspace").Areas.Area1.Gym.TrainingEquipment.WorkoutStation.Collider.CFrame
-			repeat
-				wait()
-				fireproximityprompt(v)
-			until HumanoidRootPart.Anchored == true
+
+local function AutoWorkOut()
+	for Index, Variable in pairs(TrainingEquipment) do
+		if Variable:IsA(ProximityPromptString) then
+			HumanoidRootPart.CFrame = Collider.CFrame
+
+			repeat wait() fireproximityprompt(Variable) until HumanoidRootPart.Anchored
 		end
 	end
-	while _G.auto do
-		task.wait()
-		if not _G.multipier or _G.multipier == 0 then
-			game:GetService("ReplicatedStorage").StrongMan_UpgradeStrength:InvokeServer()
-		else
-			game:GetService("ReplicatedStorage").StrongMan_UpgradeStrength:InvokeServer(_G.multipier)
+	
+	task.spawn(function()
+		while getgenv().Settings.Automatic do 
+			UpgradeStrength:InvokeServer(getgenv().Settings.Multiplier)
+			task.wait()
 		end
-	end
+	end)
 end
+
 local function LagServer()
-	wait(0.1)
-	for i, v in pairs(game:GetService("Workspace").Areas.Area1.Gym.TrainingEquipment:GetDescendants()) do
-		if v:IsA("ProximityPrompt") then
-			HumanoidRootPart.CFrame = game:GetService("Workspace").Areas.Area1.Gym.TrainingEquipment.WorkoutStation.Collider.CFrame
-			repeat
-				wait()
-				fireproximityprompt(v)
-			until HumanoidRootPart.Anchored == true
+	for Index, Variable in pairs(TrainingEquipment) do
+		if Variable:IsA(ProximityPromptString) then
+			HumanoidRootPart.CFrame = Collider.CFrame
+
+			repeat wait() fireproximityprompt(Variable) until HumanoidRootPart.Anchored
 		end
 	end
-	for i = 1, 400 do
-		pcall(function()
-			game:GetService("ReplicatedStorage").StrongMan_UpgradeStrength:InvokeServer(2 ^ 1024)
+
+	for _ = TheNumberOne, TheNumberFourHundred do
+		task.spawn(function()
+			UpgradeStrength:InvokeServer(WTFInteger)
 		end)
 	end
 end
 
 local function BreakExits()
-	for _, v in pairs(game:GetService("Workspace").Areas:GetDescendants()) do
-		if v.Name:lower():find("exit") or v.Name:lower():find("copy") then
-			v:Destroy()
+	for Index, Variable in pairs(Areas) do
+		for Index2 = TheNumberOne, #HitList do
+			if Variable:lower():find(HitList[Index2]) then
+				Variable:Destroy()
+			end
 		end
 	end
 end
-game:GetService("Workspace").Avoid:ClearAllChildren()
-game:GetService("Workspace").Avoid.ChildAdded:Connect(function(add)
-	rs.RenderStepped:Wait()
-	add:Destroy()
-end)
 
-local rs = game:GetService("RunService")
-game:GetService("Workspace").PlayerDraggables[game.Players.LocalPlayer.UserId].DescendantAdded:Connect(function(added)
-	if added.Name == "ExtraWeight" and _G.noweight then
-		added:Destroy()
+local function Rejoin()
+	TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId)
+end
+
+local function DisablePurchasePrompt()
+	if getgenv().Settings.DisablePurchase then
+		getgenv().Settings.DisablePurchase = false
+		CoreGui.PurchasePromptApp.Enabled = false
+
+		elseif not getgenv().Settings.DisablePurchase then
+
+		getgenv().Settings.DisablePurchase = true
+		CoreGui.PurchasePromptApp.Enabled = true
 	end
-end)
-game:GetService("Workspace").PlayerDraggables[game.Players.LocalPlayer.UserId].DescendantAdded:Connect(function(added)
-	rs.RenderStepped:Wait()
-	if  added:IsA("Part") and added:FindFirstChild("Coins") ~= nil then
-		if not _G.On then
-			return
-		end
-		repeat
-			wait(0.1)
-			firetouchinterest(added, game:GetService("Workspace").Areas["Area14_Retro"].Goal, 0)
-			firetouchinterest(added, game:GetService("Workspace").Areas["Area14_Retro"].Goal, 1)
-		until added == nil
-	end
-end)
+end
 
+-- Don't know why you did this
+HumanoidRootPart.CFrame = NewCFrame
+task.wait(0.25)
+HumanoidRootPart.CFrame = OldCFrame
 
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
+-- Ui
+
 local venyx = library.new("Strongman Simulator", 5013109572)
 
 local main = venyx:addPage("Main", 5012544693)
@@ -130,32 +177,17 @@ mainsec:addButton("Lag Server", function()
 end)
 
 Settingss:addButton("Rejoin Server", function()
-	game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId)
+	Rejoin()
 end)
-local oldpos = HumanoidRootPart.CFrame
-HumanoidRootPart.CFrame = CFrame.new(-79.9094696, 19.8263607, 8124.82129, 1, 0, 0, 0, 1, 0, 0, 0, 1)
-wait(0.25)
-HumanoidRootPart.CFrame = oldpos
-for _, v in pairs(area.DraggableItems:GetDescendants()) do
-	if v:IsA("StringValue") and v.Name == "Title" and v.Value == "PYRAMID" then
-		local part = v.Parent.InteractionPoint
-		_G.Prox = v.Parent.InteractionPoint.ProximityPrompt
-	end
-end
+
 
 mainsec:addToggle("Disable Purchase Prompts", nil, function(value)
-	_G.Value = value
-	if _G.Value then
-		game:GetService("CoreGui").PurchasePromptApp.Enabled = false
-	else
-		_G.Value = value
-		game:GetService("CoreGui").PurchasePromptApp.Enabled = true
-	end
+	DisablePurchasePrompt()
 end)
 
-autofarm:addToggle("Enabled", nil, function(value)
-	_G.On = value
-	HumanoidRootPart.CFrame = CFrame.new(-79.9094696, 19.8263607, 8124.82129, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+autofarm:addToggle("Enabled", nil, function(value) -- i'll optimize this code later
+	getgenv().Settings.Toggle = value
+	HumanoidRootPart.CFrame = NewCFrame
 	wait(0.1)
 	task.defer(function()
 		game.RunService.RenderStepped:connect(function()
@@ -167,7 +199,7 @@ autofarm:addToggle("Enabled", nil, function(value)
 		end)
 	end)
 end)
-autostrength:addToggle("Enabled", nil, function(value)
+autostrength:addToggle("Enabled", nil, function(value) -- i'll optimize this code later
 	_G.auto = value
 	if _G.auto then
 		game:GetService("CoreGui").PurchasePromptApp.Enabled = false
@@ -176,12 +208,47 @@ autostrength:addToggle("Enabled", nil, function(value)
 		game:GetService("CoreGui").PurchasePromptApp.Enabled = true
 	end
 end)
-autostrength:addSlider("Muliplier", 0, 0, 500, function(value)
-	_G.multipier = value
+autostrength:addSlider("Muliplier", 0, 0, 500, function(value) -- i'll optimize this code later 
+	getgenv().Settings.Multipier = value
 end)
-char:addSlider("WalkSpeed", 0, 0, 1000, function(value)
-	game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+char:addSlider("WalkSpeed", 0, 0, 1000, function(value) -- i'll optimize this code later 
+	Humanoid.WalkSpeed = value
 end)
-char:addSlider("JumpPower", 0, 0, 1000, function(value)
-	game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
+char:addSlider("JumpPower", 0, 0, 1000, function(value) -- i'll optimize this code later
+	Humanoid.JumpPower = value 
 end)
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- // Signals \\ --
+PlayerDraggablesObject.DescendantAdded:Connect(function(AddedObject)
+	if AddedObject.Name == WeightString and getgenv().Settings.WeightToggle then
+		AddedObject:Destroy()
+
+	elseif getgenv().Settings.Toggle and AddedObject:IsA(PartString) and AddedObject:FindFirstChild(CoinString) then
+		repeat task.wait() until firetouchinterest(AddedObject, Goal, TheNumberZero); firetouchinterest(AddedObject, Goal, TheNumberOne); not added
+	end
+end)
+
+Avoid:ClearAllChildren()
+Avoid.ChildAdded:Connect(function(AddedObject)
+	task.wait()
+	AddedObject:Destroy()
+end)
+
+--[[for _, v in pairs(Area.DraggableItems:GetDescendants()) do
+	if v:IsA("StringValue") and v.Name == "Title" and v.Value == "PYRAMID" then
+		local part = v.Parent.InteractionPoint
+		_G.Prox = v.Parent.InteractionPoint.ProximityPrompt
+	end
+end]] -- i dont know what this does
