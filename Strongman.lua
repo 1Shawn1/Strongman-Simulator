@@ -10,6 +10,7 @@ getgenv().Settings = {
 	['WeightToggle'] = true;
 	['Multiplier'] = 0;
 	['DisablePurchase'] = false;
+	['Proximity'] = 0;
 };
 
 local Codes = {
@@ -189,14 +190,12 @@ autofarm:addToggle("Enabled", nil, function(value) -- i'll optimize this code la
 	getgenv().Settings.Toggle = value
 	HumanoidRootPart.CFrame = NewCFrame
 	wait(0.1)
-	task.defer(function()
-		game.RunService.RenderStepped:connect(function()
+	task.spawn(function()
+		while getgenv().Settings.Toggle do
 			task.wait(0.1)
-			if _G.On then
-				HumanoidRootPart.CFrame = CFrame.new(-79.9094696, 19.8263607, 8124.82129, 1, 0, 0, 0, 1, 0, 0, 0, 1)
-				fireproximityprompt(_G.Prox, 0)
-			end
-		end)
+			HumanoidRootPart.CFrame = NewCFrame
+			fireproximityprompt(getgenv().Settings.Proximity, TheNumberZero)
+		end
 	end)
 end)
 autostrength:addToggle("Enabled", nil, function(value) -- i'll optimize this code later
