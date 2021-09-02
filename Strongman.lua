@@ -236,7 +236,7 @@ PlayerDraggablesObject.DescendantAdded:Connect(function(AddedObject)
 		AddedObject:Destroy()
 
 	elseif getgenv().Settings.Toggle and AddedObject:IsA(PartString) and AddedObject:FindFirstChild(CoinString) then
-		repeat task.wait() until firetouchinterest(AddedObject, Goal, TheNumberZero); firetouchinterest(AddedObject, Goal, TheNumberOne); not added
+		repeat task.wait() until firetouchinterest(AddedObject, Goal, TheNumberZero); firetouchinterest(AddedObject, Goal, TheNumberOne); not AddedObject
 	end
 end)
 
