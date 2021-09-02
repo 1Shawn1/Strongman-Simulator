@@ -151,6 +151,13 @@ HumanoidRootPart.CFrame = OldCFrame
 
 -- Ui
 
+for _, v in pairs(workspace.Area.DraggableItems:GetDescendants()) do
+	if v:IsA("StringValue") and v.Name == "Title" and v.Value == "PYRAMID" then
+		local part = v.Parent.InteractionPoint
+		getgenv().Settings.Prox = v.Parent.InteractionPoint.ProximityPrompt
+	end
+end
+
 local venyx = library.new("Strongman Simulator", 5013109572)
 
 local main = venyx:addPage("Main", 5012544693)
