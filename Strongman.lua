@@ -6,7 +6,7 @@ end
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
 getgenv().Settings = {
 	['Toggle'] = false;
-	['Automatic'] = true;
+	['Automatic'] = false;
 	['WeightToggle'] = true;
 	['Multiplier'] = 0;
 	['DisablePurchase'] = false;
@@ -199,13 +199,16 @@ autofarm:addToggle("Enabled", nil, function(value) -- i'll optimize this code la
 	end)
 end)
 autostrength:addToggle("Enabled", nil, function(value) -- i'll optimize this code later
-	_G.auto = value
-	if _G.auto then
-		game:GetService("CoreGui").PurchasePromptApp.Enabled = false
-		task.defer(autoworkout)
-	else
-		game:GetService("CoreGui").PurchasePromptApp.Enabled = true
-	end
+	
+	getgenv().Settings.Automatic = value
+
+	task.spawn(function()
+		CoreGui.PurchasePromptApp.Enabled = false
+		while getgenv().Settings.Automatic do
+			
+		end
+		CoreGui.PurchasePromptApp.Enabled = true
+	end)
 end)
 autostrength:addSlider("Muliplier", 0, 0, 500, function(value) -- i'll optimize this code later 
 	getgenv().Settings.Multipier = value
